@@ -20,13 +20,13 @@ newPic.show();
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/1gui.png?raw=true "gui")
 
 Original Picutre
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/1.jpg?raw=true "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15.jpg?raw=true "original picture")
 
 after process
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/processed.jpg?raw=true "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15processed.jpg?raw=true "original picture")
 
 convert calculated Energy 2d color array into greyscale picture
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/OriginalEnergyGreyScale.jpg?raw=true "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15OriginalEnergyGreyScale.jpg?raw=true "original picture")
 
 after process
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/processedEnergyGreyScale.jpg?raw=true "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15processedEnergyGreyScale.jpg?raw=true "original picture")
