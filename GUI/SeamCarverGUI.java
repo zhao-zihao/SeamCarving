@@ -32,10 +32,12 @@ public class SeamCarverGUI extends javax.swing.JFrame {
         picPathLabel = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
         resultLabel = new javax.swing.JLabel();
+        refreshButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("SeamCaver");
 
-        picPathTextField.setText("path...");
+        picPathTextField.setText("enter path here...");
         picPathTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 picPathTextFieldActionPerformed(evt);
@@ -53,26 +55,34 @@ public class SeamCarverGUI extends javax.swing.JFrame {
 
         resultLabel.setText("click start to process");
 
+        refreshButton.setText("refresh");
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(refreshButton)
+                .addGap(18, 18, 18)
                 .addComponent(startButton)
                 .addGap(35, 35, 35))
             .addGroup(layout.createSequentialGroup()
+                .addGap(42, 42, 42)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(picPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(picPathLabel)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(186, Short.MAX_VALUE))
+                    .addComponent(picPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(picPathLabel)
+                    .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(163, Short.MAX_VALUE))
         );
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {refreshButton, startButton});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -80,14 +90,18 @@ public class SeamCarverGUI extends javax.swing.JFrame {
                 .addComponent(picPathLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(picPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(34, 34, 34)
+                .addGap(31, 31, 31)
                 .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
-                .addComponent(startButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(startButton)
+                    .addComponent(refreshButton))
                 .addGap(37, 37, 37))
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {picPathLabel, picPathTextField});
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {refreshButton, startButton});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -99,9 +113,15 @@ public class SeamCarverGUI extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    startButton.setEnabled(false);
-                    resultLabel.setText("");
-                    resultLabel.setText("processing...");
+                    //dispatch UI event to EDT(event dispatch thread
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            startButton.setEnabled(false);
+                            resultLabel.setText("");
+                            resultLabel.setText("processing...");
+                        }
+                    });
                     //get file path as string type
                     String path = picPathTextField.getText();
                     Picture picture = new Picture(path.trim());
@@ -122,6 +142,7 @@ public class SeamCarverGUI extends javax.swing.JFrame {
                     newPic.save("/Users/howezhao/Pictures/processed.jpg");
                     newGreyPic.save("/Users/howezhao/Pictures/processedEnergyGreyScale.jpg");
                     
+                    //dispatch UI event to EDT(event dispatch thread
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -144,6 +165,14 @@ public class SeamCarverGUI extends javax.swing.JFrame {
     private void picPathTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_picPathTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_picPathTextFieldActionPerformed
+
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
+        
+//        new Thread(() -> {
+//            resultLabel.setText("click start button to procces picture");
+//        }).start();
+        resultLabel.setText("click start button to procces picture");
+    }//GEN-LAST:event_refreshButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -183,6 +212,7 @@ public class SeamCarverGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel picPathLabel;
     private javax.swing.JTextField picPathTextField;
+    private javax.swing.JButton refreshButton;
     private javax.swing.JLabel resultLabel;
     private javax.swing.JButton startButton;
     // End of variables declaration//GEN-END:variables
