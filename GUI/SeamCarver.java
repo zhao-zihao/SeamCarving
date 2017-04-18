@@ -405,6 +405,6 @@ public class SeamCarver {
             }
         });
         
-        System.out.println("done !");
+        System.out.println("main function start");
     }	
 }

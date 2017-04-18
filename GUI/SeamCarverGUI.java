@@ -71,7 +71,7 @@ public class SeamCarverGUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(51, 51, 51)
                         .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(168, Short.MAX_VALUE))
+                .addContainerGap(186, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -82,7 +82,7 @@ public class SeamCarverGUI extends javax.swing.JFrame {
                 .addComponent(picPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(34, 34, 34)
                 .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
                 .addComponent(startButton)
                 .addGap(37, 37, 37))
         );
@@ -93,28 +93,52 @@ public class SeamCarverGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        //get file path as string type
         
-        String path = picPathTextField.getText();
-        resultLabel.setText("processing...");
-        Picture picture = new Picture(path);
-        // create instance
-        SeamCarver seamCarver = new SeamCarver(picture);
+          
+        Thread processThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    startButton.setEnabled(false);
+                    resultLabel.setText("");
+                    resultLabel.setText("processing...");
+                    //get file path as string type
+                    String path = picPathTextField.getText();
+                    Picture picture = new Picture(path.trim());
+                    // create instance
+                    SeamCarver seamCarver = new SeamCarver(picture);
+
+                    Picture greyPic = seamCarver.getGreyScalePicture();
+                    for (int i = 0; i < seamCarver.width() / 4; i++) {
+                            seamCarver.CarvingOnce();
+                    }
+
+                    Picture newPic = seamCarver.getPicture();
+                    Picture newGreyPic = seamCarver.getGreyScalePicture();
+
+                    //newPic.show();
+
+                    greyPic.save("/Users/howezhao/Pictures/OriginalEnergyGreyScale.jpg");
+                    newPic.save("/Users/howezhao/Pictures/processed.jpg");
+                    newGreyPic.save("/Users/howezhao/Pictures/processedEnergyGreyScale.jpg");
+                    
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            resultLabel.setText("Done! processed!");
+                            startButton.setEnabled(true);
+                        }
+                    });
+                    
+                } catch (Exception e){
+                    throw new java.lang.Error("this is very bad");
+                }
+            }
+        });//wrok Thread new End
         
-        Picture greyPic = seamCarver.getGreyScalePicture();
-        for (int i = 0; i < seamCarver.width() / 4; i++) {
-        	seamCarver.CarvingOnce();
-        }
+        processThread.start();
         
-        Picture newPic = seamCarver.getPicture();
-        Picture newGreyPic = seamCarver.getGreyScalePicture();
         
-        //newPic.show();
- 
-        greyPic.save("/Users/howezhao/Pictures/OriginalEnergyGreyScale.jpg");
-        newPic.save("/Users/howezhao/Pictures/processed.jpg");
-        newGreyPic.save("/Users/howezhao/Pictures/processedEnergyGreyScale.jpg");
-        resultLabel.setText("Done! processed!");
     }//GEN-LAST:event_startButtonActionPerformed
 
     private void picPathTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_picPathTextFieldActionPerformed
