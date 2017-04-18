@@ -17,6 +17,8 @@ newPic.show();
 ```       
 #### GUI using Java Swing 
 
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/1gui.png?raw=true "gui")
+
 Original Picutre
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/1.jpg?raw=true "original picture")
 
