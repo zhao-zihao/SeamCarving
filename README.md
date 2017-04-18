@@ -17,7 +17,7 @@ newPic.show();
 ```       
 
 Original Picutre
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15.jpg?raw=true "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/1.jpg?raw=true "original picture")
 
 after process
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/processed.jpg?raw=true "original picture")
