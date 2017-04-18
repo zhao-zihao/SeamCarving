@@ -1,6 +1,9 @@
 package seamCarving;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /*
  * Copyright (C) 2017 Zihao Zhao <zhaozihao7199@Gmail.com>
@@ -10,17 +13,18 @@ public class SeamCarver {
     
     // The representation of the given image
     private int[][] color;
-    
+    //    private int[][] recordSeams;
     // The energy of each pixel in the image
     private double[][] energy;
-   
+    
     // The current width and height
     private int w;
     private int h;
     
+    boolean left = true;
     /**
      * Create a seam carver object based on the given picture.
-     * 
+     *
      * @param picture the given picture
      * @throws NullPointerException if the given picture is {@code null}.
      */
@@ -35,7 +39,7 @@ public class SeamCarver {
         // using the RGB coding described at:
         // http://docs.oracle.com/javase/8/docs/api/java/awt/Color.html#getRGB()
         color = new int[h][w];
-        
+        // recordSeams = new int[h][w];
         // Set the dimensions of the energy array
         energy = new double[h][w];
         
@@ -43,6 +47,7 @@ public class SeamCarver {
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                 color[i][j] = picture.get(j, i).getRGB();
+                // recordSeams[i][j] = color[i][j];
             }
         }
         
@@ -51,7 +56,7 @@ public class SeamCarver {
     
     /**
      * Current picture.
-     * 
+     *
      * @return the current picture.
      */
     public Picture getPicture() {
@@ -66,40 +71,40 @@ public class SeamCarver {
         
         return new Picture(pic);
     }
-
+    
     public int width() {
         return w;
     }
-   
+    
     public int height() {
         return h;
     }
     
     public Picture getGreyScalePicture() {
-
-    	Picture pic = new Picture(width(), height());
-    	for (int i = 0; i < energy.length; i++) {
-    		for (int j = 0; j < energy[0].length; j++) {
-    			 //int ori = (int)energy[i][j];
-    			 int gray = ((int)energy[i][j] << 16) + ((int)energy[i][j] << 8) + (int)energy[i][j]; 
-    			// String binaryString = Integer.toBinaryString(gray);
-    			 pic.set(j, i, new Color(gray));
-    		}
-    	}
-    	return pic;
+        
+        Picture pic = new Picture(width(), height());
+        for (int i = 0; i < energy.length; i++) {
+            for (int j = 0; j < energy[0].length; j++) {
+                //int ori = (int)energy[i][j];
+                int gray = ((int)energy[i][j] << 16) + ((int)energy[i][j] << 8) + (int)energy[i][j];
+                // String binaryString = Integer.toBinaryString(gray);
+                pic.set(j, i, new Color(gray));
+            }
+        }
+        return pic;
     }
     /**
      * Energy of pixel at column x and row y.
      */
-    public double energy(int x, int y) {        
+    public double energy(int x, int y) {
         if (x >= width() || y >= height() || x < 0 || y < 0)
             throw new java.lang.IndexOutOfBoundsException();
         
         return energy[y][x];
     }
-          
+    
     private void calcEnergy() {
-    	// Pre-calculate the energy array
+        // Pre-calculate the energy array
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                 energy[i][j] = calcEnergy(j, i);
@@ -107,10 +112,10 @@ public class SeamCarver {
         }
     }
     
-    private double calcEnergy(int x, int y) {        
+    private double calcEnergy(int x, int y) {
         if (x >= width() || y >= height() || x < 0 || y < 0)
             throw new java.lang.IndexOutOfBoundsException();
-                
+        
         // Return 1000.0 for border pixels
         if (x == 0 || y == 0 || x == width() - 1 || y == height() - 1)
             return (double) 1000;
@@ -129,35 +134,58 @@ public class SeamCarver {
      */
     private double gradient(Color a, Color b) {
         return Math.pow(a.getRed() - b.getRed(), 2) +
-               Math.pow(a.getBlue() - b.getBlue(), 2) +
-               Math.pow(a.getGreen() - b.getGreen(), 2);
+        Math.pow(a.getBlue() - b.getBlue(), 2) +
+        Math.pow(a.getGreen() - b.getGreen(), 2);
     }
     
     
     private double[][] copyArray(double[][] array) {
-    	if (array == null || array.length == 0 || array[0].length == 0) {
-    		throw new java.lang.IllegalArgumentException("copy array is null or empty");
-    	}
-    	
-    	double[][] copy = new double[array.length][array[0].length];
-    	for (int i = 0; i < array.length; i++) {
-    		for (int j = 0; j < array[0].length; j++) {
-    			copy[i][j] = array[i][j]; 
-    		}
-    	}
-    	return copy;
-    }
-    private int findVerticalSeamBottomIdx(double[][] energyVertialSum) {
-    	//find the minimum vertical seam bottom index
-        int minIdx = 0;
-        double value = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < energyVertialSum[energyVertialSum.length - 1].length; i++) {
-        	if (value > energyVertialSum[energy.length - 1][i]) {
-        		value = energyVertialSum[energy.length - 1][i];
-        		minIdx = i;
-        	}
+        if (array == null || array.length == 0 || array[0].length == 0) {
+            throw new java.lang.IllegalArgumentException("copy array is null or empty");
         }
-        return minIdx;
+        
+        double[][] copy = new double[array.length][array[0].length];
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[0].length; j++) {
+                copy[i][j] = array[i][j];
+            }
+        }
+        return copy;
+    }
+    
+    private int findVerticalSeamBottomIdx(double[][] energyVertialSum) {
+        return findVerticalSeamBottomIdx(energyVertialSum, 0, 9);
+    }
+    
+    // get vertical seam bottom idx from colums between [a,b)
+    public int findVerticalSeamBottomIdx(double[][] energyVertialSum, int a, int b) {
+        if (a < 0 || a > 8 || b < 1 || b > 10) {
+            throw new java.lang.IllegalArgumentException("colums should between [0, 9] inclusively");
+        }
+        if (a >= b) {
+            throw new java.lang.IllegalArgumentException("b should greater than a");
+        }
+        
+        double minValue = Double.POSITIVE_INFINITY;
+        int columRange = energyVertialSum[0].length / 10;
+        
+        for (int i = a * columRange; i < b * columRange; i++) {
+            if (minValue> energyVertialSum[energyVertialSum.length - 1][i]) {
+                minValue = energyVertialSum[energyVertialSum.length - 1][i];
+            }
+        }
+        
+        List<Integer> validIdx = new ArrayList<>();
+        for (int i = a * columRange; i < b * columRange; i++) {
+            if (minValue + 0.01 >  energyVertialSum[energyVertialSum.length - 1][i]) {
+                validIdx.add(i);
+            }
+        }
+        
+        Random rd = new Random();
+        int radomNum = rd.nextInt(validIdx.size());
+        
+        return validIdx.get(radomNum);
     }
     
     
@@ -165,56 +193,81 @@ public class SeamCarver {
      * @return the sequence of indices for the vertical seam.
      */
     public int[] findVerticalSeam() {
-    	double[][] energyVertialSum = copyArray(energy);
-        // start from second row
+        double[][] energyVertialSum = copyArray(energy);
+        
         // dynamic programming
-    	
-        for (int i = 1; i < energyVertialSum.length; i++) {
-        	for (int j = 0; j < energyVertialSum[0].length; j++) {
-        		double min = Double.POSITIVE_INFINITY;
-        		if (j > 0) {
-        			min = Math.min(min, energyVertialSum[i - 1][j - 1]);
-        		}
-        		if (j < energyVertialSum[0].length - 1) {
-        			min = Math.min(min, energyVertialSum[i - 1][j + 1]);
-        		}
-        		min = Math.min(min, energyVertialSum[i - 1][j]);
-        		energyVertialSum[i][j] += min;
-        	}
-        }    
+        energyVertialSum = calculateEnergyPathDp(energyVertialSum);
+        
         //get the seam
-        int idx = findVerticalSeamBottomIdx(energy);
+        int idx = findVerticalSeamBottomIdx(energyVertialSum);
         int [] seam = findVerticalSeamFromBottom(energyVertialSum, idx);
         return seam;
     }
     
+    public int[] findVerticalSeam(int a, int b) {
+        double[][] energyVertialSum = copyArray(energy);
+        
+        // dynamic programming
+        energyVertialSum = calculateEnergyPathDp(energyVertialSum);
+        
+        //get the seam
+        int idx = findVerticalSeamBottomIdx(energyVertialSum, a, b);
+        int [] seam = findVerticalSeamFromBottom(energyVertialSum, idx);
+        return seam;
+    }
+    
+    private double[][] calculateEnergyPathDp(double[][] energyVertialSum) {
+        if (energyVertialSum == null) {
+            throw new java.lang.NullPointerException();
+        }
+        if (energyVertialSum.length == 0 || energyVertialSum[0].length == 0) {
+            throw new java.lang.IllegalArgumentException("input energyVertialSum is empty");
+        }
+        
+        for (int i = 1; i < energyVertialSum.length; i++) {
+            for (int j = 0; j < energyVertialSum[0].length; j++) {
+                double min = Double.POSITIVE_INFINITY;
+                if (j > 0) {
+                    min = Math.min(min, energyVertialSum[i - 1][j - 1]);
+                }
+                if (j < energyVertialSum[0].length - 1) {
+                    min = Math.min(min, energyVertialSum[i - 1][j + 1]);
+                }
+                min = Math.min(min, energyVertialSum[i - 1][j]);
+                energyVertialSum[i][j] += min;
+                
+            }
+        }
+        return energyVertialSum;
+    }
+    //get seam pixel position from top to bottom
     private int[] findVerticalSeamFromBottom(double[][] energyVertialSum, int minIdx) {
-    	int[] seam = new int[height()];
+        int[] seam = new int[height()];
         for (int i = energyVertialSum.length - 1; i >= 0; i--) {
-        	seam[i] = minIdx; // put index with minimum energy value to array
-        	if (i == 0) {
-        		break;
-        	}
-        	int temp = minIdx;
-        	double minValue= energyVertialSum[i][minIdx];
-        	if (temp > 0) {   //check boundary
-        		if (minValue > energyVertialSum[i - 1][temp - 1]) {
-        			minIdx = temp - 1;
-        			minValue = energyVertialSum[i - 1][temp - 1];
-        		}
-        	}
-        	
-        	if (temp < energyVertialSum[0].length - 1) {
-        		if (minValue > energyVertialSum[i - 1][temp + 1]) {
-        			minIdx = temp + 1;
-        			minValue = energyVertialSum[i - 1][temp + 1];
-        		}
-        	}
-        	
-        	if (minValue >= energyVertialSum[i - 1][temp]) {
-        		minIdx = temp;
-        		minValue = energyVertialSum[i - 1][temp];
-        	}
+            seam[i] = minIdx; // put index with minimum energy value to array
+            if (i == 0) {
+                break;
+            }
+            int temp = minIdx;
+            double minValue= energyVertialSum[i][minIdx];
+            if (temp > 0) {   //check boundary
+                if (minValue > energyVertialSum[i - 1][temp - 1]) {
+                    minIdx = temp - 1;
+                    minValue = energyVertialSum[i - 1][temp - 1];
+                }
+            }
+            
+            if (temp < energyVertialSum[0].length - 1) {
+                if (minValue > energyVertialSum[i - 1][temp + 1]) {
+                    minIdx = temp + 1;
+                    minValue = energyVertialSum[i - 1][temp + 1];
+                }
+            }
+            
+            if (minValue >= energyVertialSum[i - 1][temp]) {
+                minIdx = temp;
+                minValue = energyVertialSum[i - 1][temp];
+            }
         }
         
         return seam;
@@ -227,13 +280,13 @@ public class SeamCarver {
         
         // Check for bad input
         if (width() <= 1) {
-        	throw new java.lang.IllegalArgumentException("Picture too narrow");
+            throw new java.lang.IllegalArgumentException("Picture too narrow");
         }
         if (seam == null) {
-        	throw new java.lang.NullPointerException();
+            throw new java.lang.NullPointerException();
         }
         if (seam.length != height()) {
-        	throw new java.lang.IllegalArgumentException("Invalid seam length");
+            throw new java.lang.IllegalArgumentException("Invalid seam length");
         }
         
         // Create replacement arrays
@@ -278,34 +331,67 @@ public class SeamCarver {
                 energy[i][s] = calcEnergy(s, i);
                 energy[i][s - 1] = calcEnergy(s - 1, i);
             }
-        }        
+        }
+    }
+    
+    public Picture getPicture(int[][] pictureColors) {
+        // Create and return a new pic with the stored color information
+        Picture pic = new Picture(pictureColors[0].length, pictureColors.length);
+        for (int i = 0; i < pictureColors.length; i++) {
+            for (int j = 0; j < pictureColors[i].length; j++) {
+                pic.set(j, i, new Color(pictureColors[i][j]));
+            }
+        }
+        return new Picture(pic);
     }
     
     public void CarvingOnce() {
-    	int[] seam = this.findVerticalSeam();
-    	this.removeVerticalSeam(seam);
+        int[] seam = this.findVerticalSeam();
+        this.removeVerticalSeam(seam);
+    }
+    
+    public void CarvingOnce(int a, int b) {
+        int[] seam = this.findVerticalSeam(a, b);
+        this.removeVerticalSeam(seam);
     }
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-    	Picture picture = new Picture("/Users/howezhao/Pictures/7.png");
-    	// picture.show();
-    	SeamCarver seamCarver = new SeamCarver(picture);
-    	Picture pic = seamCarver.getGreyScalePicture();
-    	pic.save("/Users/howezhao/Pictures/111.png");
-    	for (int i = 0; i < seamCarver.width() / 3; i++) {
-    		seamCarver.CarvingOnce();
-    	}
-    	Picture newPic = seamCarver.getPicture();
-    	newPic.show();
-    	newPic.save("/Users/howezhao/Pictures/000.png");
-    	Picture pic2 = seamCarver.getGreyScalePicture();
-    	pic2.save("/Users/howezhao/Pictures/222.png");
-    	int i =0;
-    	System.out.println(i);
+        // get file path
+        Picture picture = new Picture(args[0]);
+        // create instance
+        SeamCarver seamCarver = new SeamCarver(picture);
+        
+        Picture greyPic = seamCarver.getGreyScalePicture();
+        for (int i = 0; i < seamCarver.width() / 8; i++) {
+            //seamCarver.CarvingOnce(0,3);
+            seamCarver.CarvingOnce(0,3);
+            seamCarver.CarvingOnce(7,10);
+        }
+        
+        Picture newPic = seamCarver.getPicture();
+        Picture newGreyPic = seamCarver.getGreyScalePicture();
+        
+        //newPic.show();
+        
+        greyPic.save("/Users/howezhao/Pictures/OriginalEnergyGreyScale.png");
+        newPic.save("/Users/howezhao/Pictures/processed.jpg");
+        newGreyPic.save("/Users/howezhao/Pictures/processedEnergyGreyScale.jpg");
+        
+        System.out.println("done !");
     }	
 }
+
+
+
+
+
+
+
+
+
+
+
 

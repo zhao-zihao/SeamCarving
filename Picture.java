@@ -1,4 +1,4 @@
-package seamCarving;
+
 
 /******************************************************************************
  *  Compilation:  javac Picture.java
