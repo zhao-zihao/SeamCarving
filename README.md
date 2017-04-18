@@ -15,6 +15,7 @@ for (int i = 0; i < seamCarver.width() / 4; i++) {
 Picture newPic = seamCarver.getPicture();
 newPic.show();
 ```       
+#### GUI using Java Swing 
 
 Original Picutre
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/1.jpg?raw=true "original picture")
