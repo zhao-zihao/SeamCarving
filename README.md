@@ -26,7 +26,7 @@ after process
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15processed.jpg?raw=true "original picture")
 
 convert calculated Energy 2d color array into greyscale picture
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15riginalEnergyGreyScale.jpg?raw=true "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15riginalEnergyGreyScale.png?raw=true "original picture")
 
 after process
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15processedEnergyGreyScale.jpg?raw=true "original picture")
