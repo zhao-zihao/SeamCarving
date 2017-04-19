@@ -1,7 +1,10 @@
-# seam
-Using seam carving technique to resize picture.
+# seam carver 
 
-In addition to standard seam carving, I also convert a picture into 10 colums like grid system in twitter Bootstrap, you can choose to proccess each colum and leave other part untouched.
+Using seam carving technique to reduce picture width by delete unimportant pixels.
+
+you can find the paper here https://inst.eecs.berkeley.edu/~cs194-26/fa16/hw/proj4-seamcarving/imret.pdf
+
+In addition to standard seam carving, this project convert a picture into 10 colums like grid system in twitter Bootstrap, you can choose to proccess each colum and leave other part untouched.
 For example, the following code means that reduce image width to `25%` and the seam is searched from the first 3 colums. 
 ```
 Picture picture = new Picture(args[0]);
@@ -16,6 +19,11 @@ Picture newPic = seamCarver.getPicture();
 newPic.show();
 ```       
 #### GUI using Java Swing 
+
+Using Java Swing graphics library to build a simple graphic user interface. To use this GUI
+1. copy and paste image path to a text field 
+2. enter a number in the range of [1, 99] inclusively to indicate image width percentage of the picture and the original after processing.
+3. It features a progress bar to indicate progress of the image processing.
 
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/1.gif?raw=true "gui")
 
