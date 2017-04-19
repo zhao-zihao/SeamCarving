@@ -1,14 +1,19 @@
-package seamCarving;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package seamcarver;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/*
- * Copyright (C) 2017 Zihao Zhao <zhaozihao7199@Gmail.com>
+/**
+ *
+ * @author howezhao
  */
-
 public class SeamCarver {
     
     // The representation of the given image
@@ -54,53 +59,16 @@ public class SeamCarver {
         calcEnergy();
     }
     
-    /**
-     * Current picture.
-     *
-     * @return the current picture.
-     */
-    public Picture getPicture() {
-        
-        // Create and return a new pic with the stored color information
-        Picture pic = new Picture(width(), height());
-        for (int i = 0; i < height(); i++) {
-            for (int j = 0; j < width(); j++) {
-                pic.set(j, i, new Color(color[i][j]));
-            }
-        }
-        
-        return new Picture(pic);
+    
+    
+    public void carvingOnce() {
+        int[] seam = this.findVerticalSeam();
+        this.removeVerticalSeam(seam);
     }
     
-    public int width() {
-        return w;
-    }
-    
-    public int height() {
-        return h;
-    }
-    
-    public Picture getGreyScalePicture() {
-        
-        Picture pic = new Picture(width(), height());
-        for (int i = 0; i < energy.length; i++) {
-            for (int j = 0; j < energy[0].length; j++) {
-                //int ori = (int)energy[i][j];
-                int gray = ((int)energy[i][j] << 16) + ((int)energy[i][j] << 8) + (int)energy[i][j];
-                // String binaryString = Integer.toBinaryString(gray);
-                pic.set(j, i, new Color(gray));
-            }
-        }
-        return pic;
-    }
-    /**
-     * Energy of pixel at column x and row y.
-     */
-    public double energy(int x, int y) {
-        if (x >= width() || y >= height() || x < 0 || y < 0)
-            throw new java.lang.IndexOutOfBoundsException();
-        
-        return energy[y][x];
+    public void carvingOnce(int a, int b) {
+        int[] seam = this.findVerticalSeam(a, b);
+        this.removeVerticalSeam(seam);
     }
     
     private void calcEnergy() {
@@ -149,15 +117,31 @@ public class SeamCarver {
         return Math.sqrt(gradient(up, down) + gradient(left, right));
     }
     
-    /**
-     * Returns the gradient computed from the two Colors a and b
-     */
-    private double gradient(Color a, Color b) {
-        return Math.pow(a.getRed() - b.getRed(), 2) +
-        Math.pow(a.getBlue() - b.getBlue(), 2) +
-        Math.pow(a.getGreen() - b.getGreen(), 2);
+    // O(h*w) h = height, w = width
+    private double[][] calculateEnergyPathDp(double[][] energyVertialSum) {
+        if (energyVertialSum == null) {
+            throw new java.lang.NullPointerException();
+        }
+        if (energyVertialSum.length == 0 || energyVertialSum[0].length == 0) {
+            throw new java.lang.IllegalArgumentException("input energyVertialSum is empty");
+        }
+        
+        for (int i = 1; i < energyVertialSum.length; i++) {
+            for (int j = 0; j < energyVertialSum[0].length; j++) {
+                double min = Double.POSITIVE_INFINITY;
+                if (j > 0) {
+                    min = Math.min(min, energyVertialSum[i - 1][j - 1]);
+                }
+                if (j < energyVertialSum[0].length - 1) {
+                    min = Math.min(min, energyVertialSum[i - 1][j + 1]);
+                }
+                min = Math.min(min, energyVertialSum[i - 1][j]);
+                energyVertialSum[i][j] += min;
+                
+            }
+        }
+        return energyVertialSum;
     }
-    
     
     private double[][] copyArray(double[][] array) {
         if (array == null || array.length == 0 || array[0].length == 0) {
@@ -171,6 +155,16 @@ public class SeamCarver {
             }
         }
         return copy;
+    }
+    
+    /**
+     * Energy of pixel at column x and row y.
+     */
+    public double energy(int x, int y) {
+        if (x >= width() || y >= height() || x < 0 || y < 0)
+            throw new java.lang.IndexOutOfBoundsException();
+        
+        return energy[y][x];
     }
     
     private int findVerticalSeamBottomIdx(double[][] energyVertialSum) {
@@ -241,34 +235,9 @@ public class SeamCarver {
         return seam;
     }
     
-    // O(h*w) h = height, w = width
-    private double[][] calculateEnergyPathDp(double[][] energyVertialSum) {
-        if (energyVertialSum == null) {
-            throw new java.lang.NullPointerException();
-        }
-        if (energyVertialSum.length == 0 || energyVertialSum[0].length == 0) {
-            throw new java.lang.IllegalArgumentException("input energyVertialSum is empty");
-        }
-        
-        for (int i = 1; i < energyVertialSum.length; i++) {
-            for (int j = 0; j < energyVertialSum[0].length; j++) {
-                double min = Double.POSITIVE_INFINITY;
-                if (j > 0) {
-                    min = Math.min(min, energyVertialSum[i - 1][j - 1]);
-                }
-                if (j < energyVertialSum[0].length - 1) {
-                    min = Math.min(min, energyVertialSum[i - 1][j + 1]);
-                }
-                min = Math.min(min, energyVertialSum[i - 1][j]);
-                energyVertialSum[i][j] += min;
-                
-            }
-        }
-        return energyVertialSum;
-    }
     //get seam pixel position from top to bottom
     //O(h), h = height of the picture
-    private int[] findVerticalSeamFromBottom(double[][] energyVertialSum, int minIdx) {
+    public int[] findVerticalSeamFromBottom(double[][] energyVertialSum, int minIdx) {
         int[] seam = new int[height()];
         double[] seamValue= new double[height()];
         for (int i = energyVertialSum.length - 1; i >= 0; i--) {
@@ -305,6 +274,64 @@ public class SeamCarver {
         
         return seam;
     }
+    
+    /**
+     * Returns the gradient computed from the two Colors a and b
+     */
+    private double gradient(Color a, Color b) {
+        return Math.pow(a.getRed() - b.getRed(), 2) +
+        Math.pow(a.getBlue() - b.getBlue(), 2) +
+        Math.pow(a.getGreen() - b.getGreen(), 2);
+    }
+    
+    public Picture getGreyScalePicture() {
+        
+        Picture pic = new Picture(width(), height());
+        for (int i = 0; i < energy.length; i++) {
+            for (int j = 0; j < energy[0].length; j++) {
+                //int ori = (int)energy[i][j];
+                int gray = ((int)energy[i][j] << 16) + ((int)energy[i][j] << 8) + (int)energy[i][j];
+                // String binaryString = Integer.toBinaryString(gray);
+                pic.set(j, i, new Color(gray));
+            }
+        }
+        return pic;
+    }
+    
+    /**
+     * Current picture.
+     *
+     * @return the current picture.
+     */
+    public Picture getPicture() {
+        
+        // Create and return a new pic with the stored color information
+        Picture pic = new Picture(width(), height());
+        for (int i = 0; i < height(); i++) {
+            for (int j = 0; j < width(); j++) {
+                pic.set(j, i, new Color(color[i][j]));
+            }
+        }
+        
+        return new Picture(pic);
+    }
+    
+    public Picture getPicture(int[][] pictureColors) {
+        // Create and return a new pic with the stored color information
+        Picture pic = new Picture(pictureColors[0].length, pictureColors.length);
+        for (int i = 0; i < pictureColors.length; i++) {
+            for (int j = 0; j < pictureColors[i].length; j++) {
+                pic.set(j, i, new Color(pictureColors[i][j]));
+            }
+        }
+        return new Picture(pic);
+    }
+    
+    
+    
+    
+    
+    
     
     /**
      * Remove vertical seam from current picture.
@@ -367,64 +394,26 @@ public class SeamCarver {
         }
     }
     
-    public Picture getPicture(int[][] pictureColors) {
-        // Create and return a new pic with the stored color information
-        Picture pic = new Picture(pictureColors[0].length, pictureColors.length);
-        for (int i = 0; i < pictureColors.length; i++) {
-            for (int j = 0; j < pictureColors[i].length; j++) {
-                pic.set(j, i, new Color(pictureColors[i][j]));
-            }
-        }
-        return new Picture(pic);
+    public int width() {
+        return w;
     }
     
-    public void CarvingOnce() {
-        int[] seam = this.findVerticalSeam();
-        this.removeVerticalSeam(seam);
-    }
-    
-    public void CarvingOnce(int a, int b) {
-        int[] seam = this.findVerticalSeam(a, b);
-        this.removeVerticalSeam(seam);
+    public int height() {
+        return h;
     }
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // get file path
-        Picture picture = new Picture(args[0]);
-        // create instance
-        SeamCarver seamCarver = new SeamCarver(picture);
         
-        Picture greyPic = seamCarver.getGreyScalePicture();
-        for (int i = 0; i < seamCarver.width() / 4; i++) {
-            //seamCarver.CarvingOnce(0,3);
-            seamCarver.CarvingOnce();
-            //seamCarver.CarvingOnce();
-        }
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new SeamCarverGUI().setVisible(true);
+            }
+        });
         
-        Picture newPic = seamCarver.getPicture();
-        Picture newGreyPic = seamCarver.getGreyScalePicture();
-        
-        //newPic.show();
-        
-        greyPic.save("/Users/howezhao/Pictures/OriginalEnergyGreyScale.jpg");
-        newPic.save("/Users/howezhao/Pictures/processed.jpg");
-        newGreyPic.save("/Users/howezhao/Pictures/processedEnergyGreyScale.jpg");
-        
-        System.out.println("done !");
+        System.out.println("main function start");
     }	
 }
-
-
-
-
-
-
-
-
-
-
-
-

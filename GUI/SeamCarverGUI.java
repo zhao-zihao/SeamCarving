@@ -33,11 +33,14 @@ public class SeamCarverGUI extends javax.swing.JFrame {
         startButton = new javax.swing.JButton();
         resultLabel = new javax.swing.JLabel();
         refreshButton = new javax.swing.JButton();
+        resizedWidthTextField = new javax.swing.JTextField();
+        resizedWidthLabel = new javax.swing.JLabel();
+        progressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SeamCaver");
 
-        picPathTextField.setText("enter path here...");
+        picPathTextField.setText("picture path here...");
         picPathTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 picPathTextFieldActionPerformed(evt);
@@ -62,6 +65,15 @@ public class SeamCarverGUI extends javax.swing.JFrame {
             }
         });
 
+        resizedWidthTextField.setText("enter number in [1, 99]");
+        resizedWidthTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resizedWidthTextFieldActionPerformed(evt);
+            }
+        });
+
+        resizedWidthLabel.setText("Width after processed");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -71,28 +83,43 @@ public class SeamCarverGUI extends javax.swing.JFrame {
                 .addComponent(refreshButton)
                 .addGap(18, 18, 18)
                 .addComponent(startButton)
-                .addGap(35, 35, 35))
+                .addGap(41, 41, 41))
             .addGroup(layout.createSequentialGroup()
-                .addGap(42, 42, 42)
+                .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(picPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(picPathLabel)
-                    .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(163, Short.MAX_VALUE))
+                    .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(picPathLabel)
+                            .addComponent(resizedWidthLabel))
+                        .addGap(27, 27, 27)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(picPathTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                            .addComponent(resizedWidthTextField))))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {refreshButton, startButton});
 
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {picPathTextField, resizedWidthTextField});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addComponent(picPathLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(picPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31)
+                .addGap(57, 57, 57)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(picPathLabel)
+                    .addComponent(picPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(resizedWidthLabel)
+                    .addComponent(resizedWidthTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
+                .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
                     .addComponent(refreshButton))
@@ -102,6 +129,8 @@ public class SeamCarverGUI extends javax.swing.JFrame {
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {picPathLabel, picPathTextField});
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {refreshButton, startButton});
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {resizedWidthLabel, resizedWidthTextField});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -124,15 +153,25 @@ public class SeamCarverGUI extends javax.swing.JFrame {
                     });
                     //get file path as string type
                     String path = picPathTextField.getText();
+                    int percent = Integer.valueOf(resizedWidthTextField.getText());
+                    if (percent <1 || percent > 99) {
+                        resultLabel.setText("enter width % bewteen (1, 100)");
+                        throw new java.lang.IllegalArgumentException("width percent should  bewteen (1, 100)");
+                    }
                     Picture picture = new Picture(path.trim());
                     // create instance
                     SeamCarver seamCarver = new SeamCarver(picture);
-
+                        
                     Picture greyPic = seamCarver.getGreyScalePicture();
-                    for (int i = 0; i < seamCarver.width() / 4; i++) {
-                            seamCarver.CarvingOnce();
+                    progressBar.setIndeterminate(false);
+                    int len = seamCarver.width() - (seamCarver.width() / 100 * percent);
+                    progressBar.setMaximum(len - 1);
+                    
+                    for (int i = 0; i < len; i++) {
+                            progressBar.setValue(i);
+                            seamCarver.carvingOnce();
                     }
-
+                    
                     Picture newPic = seamCarver.getPicture();
                     Picture newGreyPic = seamCarver.getGreyScalePicture();
 
@@ -150,9 +189,9 @@ public class SeamCarverGUI extends javax.swing.JFrame {
                             startButton.setEnabled(true);
                         }
                     });
-                    
+                    System.out.println("Done! Processed!");
                 } catch (Exception e){
-                    throw new java.lang.Error("this is very bad");
+                    throw new java.lang.Error(e);
                 }
             }
         });//wrok Thread new End
@@ -171,8 +210,16 @@ public class SeamCarverGUI extends javax.swing.JFrame {
 //        new Thread(() -> {
 //            resultLabel.setText("click start button to procces picture");
 //        }).start();
-        resultLabel.setText("click start button to procces picture");
+        startButton.setEnabled(true);
+        progressBar.setValue(0);
+        resizedWidthTextField.setText("please enter [1, 99]");
+        resultLabel.setText("reseted! click start button to procces picture");
     }//GEN-LAST:event_refreshButtonActionPerformed
+
+    private void resizedWidthTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resizedWidthTextFieldActionPerformed
+
+        
+    }//GEN-LAST:event_resizedWidthTextFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -212,7 +259,10 @@ public class SeamCarverGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel picPathLabel;
     private javax.swing.JTextField picPathTextField;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JButton refreshButton;
+    private javax.swing.JLabel resizedWidthLabel;
+    private javax.swing.JTextField resizedWidthTextField;
     private javax.swing.JLabel resultLabel;
     private javax.swing.JButton startButton;
     // End of variables declaration//GEN-END:variables
