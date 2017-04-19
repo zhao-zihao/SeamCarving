@@ -20,6 +20,6 @@ newPic.show();
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/1.gif?raw=true "gui")
 
 #### Picutre
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/2.gif?raw=true "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/4.gif?raw=true "original picture")
 
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/3.gif?raw=true "original picture")
+
