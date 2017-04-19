@@ -17,16 +17,9 @@ newPic.show();
 ```       
 #### GUI using Java Swing 
 
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/1gui.png?raw=true "gui")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/1.gif?raw=true "gui")
 
-Original Picutre
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15.jpg "original picture")
+#### Picutre
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/2.gif?raw=true "original picture")
 
-after process
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15processed.jpg "original picture")
-
-convert calculated Energy 2d color array into greyscale picture
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15OriginalEnergyGreyScale.png "original picture")
-
-after process
-![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/testPicture/15processedEnergyGreyScale.jpg "original picture")
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/3.gif?raw=true "original picture")
