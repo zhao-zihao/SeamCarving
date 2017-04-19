@@ -19,7 +19,7 @@ newPic.show();
 
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/1.gif?raw=true "gui")
 
-#### Picutre
+#### Image
 ![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/4.gif?raw=true "original picture")
-
-
+#### Draw Image Energy value calculated from each pixel and then convert to grayscale image
+![alt text](https://github.com/HoweZZH/SeamCarving/blob/master/guiPicture/5.gif?raw=true "original picture")
